@@ -7,167 +7,25 @@
 // 		% 1. Characters
 // 		% 2. 'opbrack', 'clbrack', ...
 // 		% 3. 'tag', 'text', 'entity'
-// 		% [UNDONE YET] 4. `element`
+// 		% [UNDONE YET] 4. `root`, `element`, 'prolog'
 // ! For this - RESTRUCTURE THE PARSER [as it is: A. incomplete; B. buggy; C. un-refactored]
 
-import { CommentParser, EqualitySign } from "./tag.mjs"
+// ! DO not use this as a 'default' export, instead use as value for 'parse'
+// export default function XMLParse(xml) {
+// 	return parse(InputStream(tokenize(InputStream(xml))))
+// }
 
-import {
-	BasicMap,
-	InputStream,
-	PatternTokenizer,
-	PatternValidator,
-	RegExpMap,
-	SourceGenerator,
-	StreamParser,
-	StreamValidator,
-	StringSource,
-	TableParser,
-	Token,
-	TokenMap,
-	regex,
-	skip
-} from "@hgargg-0710/parsers.js"
-import { TagParser, tagExtract } from "./tag.mjs"
+export * as generate from "./generate.mjs"
+export * as char from "./char.mjs"
+export * as element from "./element.mjs"
+export * as tag from "./tag.mjs"
+export { default as generate } from "./generate.mjs"
 
-const { anything, global, space } = regex
+// ! MAKE THESE EXPORTS! [supposed to be doing what they say...]
+// export const tokenize = PatternTokenizer(xmlTokens)
+// export const generate = SourceGenerator(xmlGenerator)
+// export const parse = StreamParser(xmlParser)
+// export const tokenValidate = PatternValidator(xmlValidator)
+// export const validate = StreamValidator(xmlValidator)
 
-export const [
-	OpBrack,
-	ClBrack,
-	CLSlash,
-	Quote,
-	CommentBeginning,
-	CommentEnding,
-	Ampersand,
-	Space
-] = [
-	["opbrack", "<"],
-	["clbrack", ">"],
-	["clslash", "/"],
-	["quote", '"'],
-	["commentbeg", "!--"],
-	["commentend", "--"],
-	["amp", "&"],
-	["space", ""]
-].map((pair) => () => Token(...pair))
-export const [Text, XMLSymbol, Entity] = ["text", "symbol", "entity"].map(
-	(type) => (value) => Token(type, value)
-)
-export const Tag = (name, attrs, closing = false, comment = false) =>
-	Token("tag", { name, attrs, closing, comment })
-
-export const xmlTokens = RegExpMap(
-	new Map(
-		[
-			[/</, OpBrack],
-			[/>/, ClBrack],
-			[/\//, CLSlash],
-			[/=/, EqualitySign],
-			[/"/, Quote],
-			[/!--/, CommentBeginning],
-			[/--/, CommentEnding],
-			[space(), Space],
-			[anything(), XMLSymbol]
-		].map((x) => [global(x[0]), x[1]])
-	)
-)
-
-const tagRead = read((input) => Token.type(input.curr()) === "clbrack", "")
-
-export const tagParser = [
-	[false, false],
-	[true, false],
-	[false, true]
-].map(([closing, comment]) =>
-	(
-		(f) => (x) =>
-			tagExtract(f(x))
-	)(comment ? CommentParser : TagParser(closing))
-)
-
-export const skipSpace = (input) =>
-	skip(input)((input, i, j) => Token.type(input.curr()) === "space")
-
-// ? Refactor these expressions of 'Token.type'? [repeat QUITE a lot within the parser...];
-export const xmlParser = TokenMap(BasicMap)(
-	new Map([
-		[
-			"space",
-			function (input) {
-				skipSpace(input)
-				return []
-			}
-		],
-		[
-			"opbrack",
-			function (input) {
-				input.next() // <
-				skipSpace(input)
-
-				const [closing, comment] = ["clslash", "commentbeg"].map(
-					(x) => Token.type(input.next()) === x
-				)
-
-				const { name, attrs } = tagParser[closing | (comment << 1)](
-					tagRead(input, (input) => [input.curr()])
-				)
-
-				return [Tag(name, attrs, closing, comment)]
-			}
-		],
-		[
-			"amp",
-			function (input) {
-				input.next() // &
-				return [Entity(input.curr().value)]
-			}
-		],
-		["quote", function () {}],
-		["symbol", function () {}]
-	])
-)
-
-export const xmlTokenValidator = RegExpMap(
-	new Map(
-		[
-			[/</, function () {}],
-			[/>/, function () {}],
-			[/\//, function () {}],
-			[/=/, function () {}],
-			[/"/, function () {}],
-			[/!--/, function () {}],
-			[/--/, function () {}],
-			[anything(), function () {}]
-		].map((x) => [global(x[0]), x[1]])
-	)
-)
-
-export const xmlValidator = TokenMap(BasicMap)(
-	new Map([
-		["opbrack", function () {}],
-		["amp", function () {}],
-		["quote", function () {}],
-		["symbol", function () {}]
-	])
-)
-
-export const xmlGenerator = TokenMap()
-
-// * A tree for 'TreeStream' iteration by 'XMLGenerator'
-// ^ Transforms the 'AST' returned by parser to the '.children-.index' form
-export function XMLTree() {}
-
-export const tokenize = PatternTokenizer(xmlTokens)
-export const generate = SourceGenerator(xmlGenerator)
-export const parse = StreamParser(xmlParser)
-export const tokenValidate = PatternValidator(xmlValidator)
-export const validate = StreamValidator(xmlValidator)
-
-export const tableParser = TableParser(xmlParser)
-
-export const XMLGenerate = (AST) => generate(TreeStream(XMLTree(AST)), StringSource())
-
-export default function XMLParse(xml) {
-	return parse(InputStream(tokenize(InputStream(xml))))
-}
+// export const tableParser = TableParser(xmlParser)
