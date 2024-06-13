@@ -1,43 +1,49 @@
 // * First-level tokens
 
-import { regex } from "@hgargg-0710/parsers.js"
+import { regex, Token, RegExpMap } from "@hgargg-0710/parsers.js"
 
-const { anything, global, space } = regex
+const { global, space, or } = regex
+
+// ^ IDEA [for the `parsers.js` library]: create a TokenType function (would create a function (type) => { (value) => ({type, value}); is: (x) => x.type === type})
+// * would fit well here...
 
 export const [
 	OpBrack,
 	ClBrack,
-	CLSlash,
-	Quote,
+	ClSlash,
 	CommentBeginning,
 	CommentEnding,
 	Ampersand,
-	Space
+	Space,
+	EqualitySign
 ] = [
-	["opbrack", "<"],
-	["clbrack", ">"],
-	["clslash", "/"],
-	["quote", '"'],
-	["commentbeg", "!--"],
-	["commentend", "--"],
-	["amp", "&"],
-	["space", ""]
-].map((pair) => () => Token(...pair))
+	"opbrack",
+	"clbrack",
+	"clslash",
+	"commentbeg",
+	"commentend",
+	"amp",
+	"space",
+	"eqsign"
+].map((type) => () => Token(type, null))
 
-export const XMLSymbol = (value) => Token("symbol", value)
+export const [XMLSymbol, Quote] = ["symbol", "quote"].map(
+	(type) => (value) => Token(type, value)
+)
 
-export const xmlTokens = RegExpMap(
+export const xmlCharTokens = RegExpMap(
 	new Map(
 		[
 			[/</, OpBrack],
 			[/>/, ClBrack],
-			[/\//, CLSlash],
+			[/\//, ClSlash],
 			[/=/, EqualitySign],
-			[/"/, Quote],
+			[/&/, Ampersand],
+			[or(/"/, /'/), Quote],
 			[/!--/, CommentBeginning],
 			[/--/, CommentEnding],
-			[space(), Space],
-			[anything(), XMLSymbol]
+			[space(), Space]
 		].map((x) => [global(x[0]), x[1]])
-	)
+	),
+	XMLSymbol
 )
