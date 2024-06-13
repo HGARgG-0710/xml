@@ -1,0 +1,16 @@
+{
+	"name": "@hgargg-0710/xml",
+	"version": "0.1.0",
+	"type": "module",
+	"main": "src/xml.mjs",
+	"dependencies": {
+		"@hgargg-0710/one": "0.1.1",
+		"@hgargg-0710/parsers.js": "0.1.1"
+	},
+	"keywords": [
+		"xml",
+		"ast",
+		"parsing",
+		"generation"
+	]
+}
