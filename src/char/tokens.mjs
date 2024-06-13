@@ -1,10 +1,9 @@
 // * First-level tokens
 
-import { regex, Token, RegExpMap } from "@hgargg-0710/parsers.js"
+import { Token } from "@hgargg-0710/parsers.js"
 
-const { global, space, or } = regex
-
-// ^ IDEA [for the `parsers.js` library]: create a TokenType function (would create a function (type) => { (value) => ({type, value}); is: (x) => x.type === type})
+// ^ IDEA [for the `parsers.js` library, v0.2]: create a TokenType function (would create a function (type) => { (value) => ({type, value}); is: (x) => x.type === type})
+// ^ IDEA [for the `parsers.js` library, v0.2]: create a 'TokenInstance' function, result of which is also a function with '.is', but result of which ONLY contains the given type (frees one from using the 'null' for 'value');
 // * would fit well here...
 
 export const [
@@ -29,21 +28,4 @@ export const [
 
 export const [XMLSymbol, Quote] = ["symbol", "quote"].map(
 	(type) => (value) => Token(type, value)
-)
-
-export const xmlCharTokens = RegExpMap(
-	new Map(
-		[
-			[/</, OpBrack],
-			[/>/, ClBrack],
-			[/\//, ClSlash],
-			[/=/, EqualitySign],
-			[/&/, Ampersand],
-			[or(/"/, /'/), Quote],
-			[/!--/, CommentBeginning],
-			[/--/, CommentEnding],
-			[space(), Space]
-		].map((x) => [global(x[0]), x[1]])
-	),
-	XMLSymbol
 )

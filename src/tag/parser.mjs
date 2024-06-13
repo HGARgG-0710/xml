@@ -1,12 +1,4 @@
-import {
-	XMLComment,
-	XMLName,
-	XMLText,
-	XMLTag,
-	XMLEntity,
-	XMLAttribute,
-	XMLString
-} from "./tokens.mjs"
+import { XMLComment, XMLName, XMLText, XMLTag, XMLAttribute } from "./tokens.mjs"
 
 import { array } from "@hgargg-0710/one"
 const { firstOut } = array
@@ -21,10 +13,12 @@ import {
 	delimited,
 	TableParser,
 	skip,
-	InputStream
+	InputStream,
+	setPredicate
 } from "@hgargg-0710/parsers.js"
 import { TokenSource } from "./types.mjs"
 import { trivialCompose } from "@hgargg-0710/one/src/functions.mjs"
+import { XMLStringParser } from "./string/parser.mjs"
 
 // ! ADD TO THE 'parsers.js' v0.2! [useful for making sub-streams... - GENERALIZE, make a separate function (optimization + simplified interface), not just an alias of 'delimited'...];
 // * NOTE: this doesn't 'accumulate' like the 'read', instead limiting...;
@@ -46,61 +40,57 @@ const parserCache = [
 	trivialCompose(tagExtract, comment ? CommentParser : TagParser(closing))
 )
 
+const isText = setPredicate(new Set(["symbol", "space"]))
+
 // ! ADD TO 'parsers.js' v0.2! (generalize, like with TokenMap)
 // * const ValueMap = BasicMap.extend(Token.value)
 
 // ? Refactor these expressions of 'Token.type'? [repeat QUITE a lot within the parser...];
 // ! REPLACE ALL '.includes' with '.has' of a 'Set'!
 export const tagParser = TokenMap(BasicMap)(
-	new Map([
+	new Map(
 		[
-			"symbol",
-			function (input) {
-				return [
-					read(
-						(input) => ["symbol", "space"].includes(Token.type(input.curr())),
-						TokenSource(XMLText(""))
-					)(input).value
-				]
-			}
-		],
-		[
-			"space",
-			function (input) {
-				skipSpace(input)
-				return []
-			}
-		],
-		[
-			"opbrack",
-			function (input) {
-				input.next() // <
-				skipSpace(input)
+			[
+				"symbol",
+				function (input) {
+					return [
+						read(
+							(input) => isText(Token.type(input.curr())),
+							TokenSource(XMLText(""))
+						)(input).value
+					]
+				}
+			],
+			[
+				"space",
+				function (input) {
+					skipSpace(input)
+					return []
+				}
+			],
+			[
+				"opbrack",
+				function (input) {
+					input.next() // <
+					skipSpace(input)
 
-				const [closing, comment] = ["clslash", "commentbeg"].map(
-					(x) => Token.type(input.curr()) === x
-				)
-				if (closing || comment) input.next()
+					const [closing, comment] = ["clslash", "commentbeg"].map(
+						(x) => Token.type(input.curr()) === x
+					)
+					if (closing || comment) input.next()
 
-				const { name, attrs } = parserCache[closing | (comment << 1)](
-					InputStream(clBrackLimitStream(input))
-				)
-				return [XMLTag(name, attrs, closing, comment)]
-			}
+					const { name, attrs } = parserCache[closing | (comment << 1)](
+						InputStream(clBrackLimitStream(input))
+					)
+					return [XMLTag(name, attrs, closing, comment)]
+				}
+			]
 		],
-		[
-			"amp",
-			function (input) {
-				input.next() // &
-				return [
-					read(
-						(input) => Token.value(input.curr()) !== ";",
-						TokenSource(XMLEntity(""))
-					)(input).value
-				]
-			}
-		]
-	])
+		// ! ADD THIS TO THE 'parsers.js' v0.2! [frequently recurring];
+		function (input) {
+			return [input.curr()]
+		}
+	)
 )
 
 const tagName = (input) =>
@@ -108,6 +98,14 @@ const tagName = (input) =>
 		(input) => Token.type(input.curr()) === "symbol",
 		TokenSource(XMLName(""))
 	)(input)
+
+// ! AGAIN! Refactor! [parsers.js v0.2];
+const limitQuotes = (input, quote) =>
+	delimited(
+		(input) =>
+			Token.type(input.curr()) !== "quote" || Token.value(input.curr()) !== quote,
+		() => false
+	)(input, (input) => [input.curr()])
 
 const delimHandler = TableParser(
 	TokenMap(BasicMap)(
@@ -122,19 +120,11 @@ const delimHandler = TableParser(
 
 				_skip((input) => Token.type(input.curr()) !== "eqsign")
 				input.next()
-
 				_skip((input) => Token.type(input.curr()) !== "quote")
-				const quote = input.next().value
-
 				return [
 					XMLAttribute(
 						attrName,
-						read(
-							(input) =>
-								Token.type(input.curr()) !== "quote" ||
-								Token.value(input.curr()) !== quote,
-							TokenSource(XMLString(""))
-						)(input).value
+						XMLStringParser(limitQuotes(input, input.next().value))
 					)
 				]
 			}
