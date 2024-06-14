@@ -5,7 +5,7 @@
 	"main": "src/xml.mjs",
 	"dependencies": {
 		"@hgargg-0710/one": "0.1.1",
-		"@hgargg-0710/parsers.js": "0.1.1"
+		"@hgargg-0710/parsers.js": "0.1.2"
 	},
 	"keywords": [
 		"xml",

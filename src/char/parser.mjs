@@ -20,6 +20,7 @@ import {
 	CommentEnding,
 	Space
 } from "./tokens.mjs"
+import { structCheck } from "@hgargg-0710/one/src/objects.mjs"
 
 const { trivialCompose } = _function
 
@@ -40,5 +41,5 @@ export const xmlCharTokens = RegExpMap(
 	XMLSymbol
 )
 
-export const charTokenizer = PatternTokenizer(xmlCharTokens)
+export const charTokenizer = PatternTokenizer(xmlCharTokens, structCheck(["type"]))
 export const XMLCharTokenizer = trivialCompose(Token.value, charTokenizer, StringPattern)

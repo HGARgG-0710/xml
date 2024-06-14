@@ -1,10 +1,15 @@
+import { Token, TokenType } from "@hgargg-0710/parsers.js"
+
+export const _XMLTag = TokenType("tag")
+
 export const XMLTag = (name, attrs, closing = false, comment = false) =>
-	Token("tag", { name, attrs, closing, comment })
+	_XMLTag({ name, attrs, closing, comment })
 
 export const [XMLName, XMLString, XMLComment, XMLText] = [
 	"name",
 	"string",
 	"comment",
 	"text"
-].map((type) => (value) => Token(type, value))
-export const XMLAttribute = (name, value) => Token("attribute", { name, value })
+].map(TokenType)
+export const _XMLAttribute = Token("attribute")
+export const XMLAttribute = (name, value) => _XMLAttribute({ name, value })

@@ -1,3 +1,6 @@
 1. Test; 
 2. Document; 
-3. Organize, fix, finish!
+3. IN v0.2 release of 'xml' (when parsers.js 0.2 and Locator is done...): 
+
+	CREATE the 'Validator' API for XML!
+	Don't want to create any of it before Locator is finished (and TypeScript support has finally arrived...)

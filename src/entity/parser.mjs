@@ -1,4 +1,4 @@
-import { BasicMap, StreamParser, TokenMap } from "@hgargg-0710/parsers.js"
+import { BasicMap, StreamParser, TokenMap, TokenSource } from "@hgargg-0710/parsers.js"
 
 export const entityMap = TokenMap(BasicMap)(
 	new Map([

@@ -1,7 +1,20 @@
 import { XMLComment, XMLName, XMLText, XMLTag, XMLAttribute } from "./tokens.mjs"
 
-import { array } from "@hgargg-0710/one"
+import { array, map, object } from "@hgargg-0710/one"
 const { firstOut } = array
+const { kv: mkv } = map
+const { dekv: odekv } = object
+
+import {
+	ClBrack,
+	ClSlash,
+	CommentBeginning,
+	CommentEnding,
+	EqualitySign,
+	Quote,
+	Space,
+	XMLSymbol
+} from "../char/tokens.mjs"
 
 import {
 	BasicMap,
@@ -14,23 +27,24 @@ import {
 	TableParser,
 	skip,
 	InputStream,
-	setPredicate
+	setPredicate,
+	TokenSource,
+	limit,
+	preserve
 } from "@hgargg-0710/parsers.js"
-import { TokenSource } from "./types.mjs"
-import { trivialCompose } from "@hgargg-0710/one/src/functions.mjs"
 import { XMLStringParser } from "./string/parser.mjs"
 
-// ! ADD TO THE 'parsers.js' v0.2! [useful for making sub-streams... - GENERALIZE, make a separate function (optimization + simplified interface), not just an alias of 'delimited'...];
-// * NOTE: this doesn't 'accumulate' like the 'read', instead limiting...;
-const clBrackLimitStream = (input) =>
-	delimited(
-		(input) => Token.type(input.curr()) !== "clbrack",
-		() => false
-	)(input, (input) => [input.curr()])
+import { function as f } from "@hgargg-0710/one"
+
+const { trivialCompose } = f
 
 // ! REFACTOR ALL OF THESE THINGS SOMEWHERE! [namely, the type-checks... - THE v0.2 of parsers.js ought to do that!];
-export const skipSpace = (input) =>
-	skip(input)((input, i, j) => Token.type(input.curr()) === "space")
+// ^ The 'from-library' definitions also (a separete module? 'refactor.mjs?')
+export const clBrackLimitStream = trivialCompose(
+	InputStream,
+	limit((input) => !ClBrack.is(input.curr()))
+)
+export const skipSpace = (input) => skip(input)((input) => !Space.is(input.curr()))
 
 const parserCache = [
 	[false, false],
@@ -40,13 +54,11 @@ const parserCache = [
 	trivialCompose(tagExtract, comment ? CommentParser : TagParser(closing))
 )
 
-const isText = setPredicate(new Set(["symbol", "space"]))
+const isText = (x) => [XMLSymbol, Space].some((y) => y.is(x))
 
 // ! ADD TO 'parsers.js' v0.2! (generalize, like with TokenMap)
 // * const ValueMap = BasicMap.extend(Token.value)
 
-// ? Refactor these expressions of 'Token.type'? [repeat QUITE a lot within the parser...];
-// ! REPLACE ALL '.includes' with '.has' of a 'Set'!
 export const tagParser = TokenMap(BasicMap)(
 	new Map(
 		[
@@ -55,7 +67,7 @@ export const tagParser = TokenMap(BasicMap)(
 				function (input) {
 					return [
 						read(
-							(input) => isText(Token.type(input.curr())),
+							(input) => isText(input.curr()),
 							TokenSource(XMLText(""))
 						)(input).value
 					]
@@ -74,38 +86,38 @@ export const tagParser = TokenMap(BasicMap)(
 					input.next() // <
 					skipSpace(input)
 
-					const [closing, comment] = ["clslash", "commentbeg"].map(
-						(x) => Token.type(input.curr()) === x
+					const [closing, comment] = [ClSlash, CommentBeginning].map((x) =>
+						x.is(input.curr())
 					)
 					if (closing || comment) input.next()
 
 					const { name, attrs } = parserCache[closing | (comment << 1)](
-						InputStream(clBrackLimitStream(input))
+						clBrackLimitStream(input)
 					)
 					return [XMLTag(name, attrs, closing, comment)]
 				}
 			]
 		],
-		// ! ADD THIS TO THE 'parsers.js' v0.2! [frequently recurring];
-		function (input) {
-			return [input.curr()]
-		}
+		preserve
 	)
 )
 
 const tagName = (input) =>
-	read(
-		(input) => Token.type(input.curr()) === "symbol",
-		TokenSource(XMLName(""))
-	)(input)
+	read((input) => XMLSymbol.is(input.curr()), TokenSource(XMLName("")))(input)
 
-// ! AGAIN! Refactor! [parsers.js v0.2];
-const limitQuotes = (input, quote) =>
-	delimited(
-		(input) =>
-			Token.type(input.curr()) !== "quote" || Token.value(input.curr()) !== quote,
-		() => false
-	)(input, (input) => [input.curr()])
+export const limitQuotes = odekv(
+	mkv(
+		new Map(
+			["'", '"'].map((quote) => [
+				quote,
+				limit(
+					(input) =>
+						!Quote.is(input.curr()) || Token.value(input.curr()) !== quote
+				)
+			])
+		)
+	)
+)
 
 const delimHandler = TableParser(
 	TokenMap(BasicMap)(
@@ -114,17 +126,17 @@ const delimHandler = TableParser(
 			function (input) {
 				const _skip = skip(input)
 				const attrName = read(
-					(input) => Token.type(input.curr()) === "symbol",
+					(input) => XMLSymbol.is(input.curr()),
 					TokenSource(XMLName(""))
 				)(input).value
 
-				_skip((input) => Token.type(input.curr()) !== "eqsign")
+				_skip((input) => !EqualitySign.is(input.curr()))
 				input.next()
-				_skip((input) => Token.type(input.curr()) !== "quote")
+				_skip((input) => !Quote.is(input.curr()))
 				return [
 					XMLAttribute(
 						attrName,
-						XMLStringParser(limitQuotes(input, input.next().value))
+						XMLStringParser(limitQuotes[input.next().value](input))
 					)
 				]
 			}
@@ -134,8 +146,8 @@ const delimHandler = TableParser(
 
 const tagDelim = (input) =>
 	delimited(
-		(input) => Token.type(input.curr()) === "clbrack",
-		(input) => Token.type(input.curr()) === "space"
+		(input) => ClBrack.is(input.curr()),
+		(input) => Space.is(input.curr())
 	)(input, delimHandler)
 
 export function tagExtract(parsedTag) {
@@ -153,11 +165,11 @@ export const CommentParser = StreamParser(
 	function (input) {
 		const _skip = skip(input)
 		const comment = read(
-			(input) => Token.type(input.curr()) !== "commentend",
+			(input) => !CommentEnding.is(input.curr()),
 			TokenSource(XMLComment(""))
 		)(input).value
 		input.next() // --
-		_skip((input) => Token.type(input.curr()) !== "clbrack")
+		_skip((input) => !ClBrack.is(input.curr()))
 		return [comment]
 	}
 )
@@ -166,10 +178,11 @@ export function TagParser(closing) {
 	return StreamParser(
 		TokenMap(BasicMap)(new Map(), function (input) {
 			const _skip = skip(input)
-			_skip((input) => Token.type(input.curr()) !== "symbol")
+			_skip((input) => !XMLSymbol.is(input.curr()))
 			const name = XMLName(tagName(input))
 			if (!closing) return [name, ...tagDelim(input)]
-			_skip((input) => Token.type(input.curr()) !== "clbrack")
+
+			_skip((input) => !ClBrack.is(input.curr()))
 			return [
 				{
 					closing,

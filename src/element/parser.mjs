@@ -1,22 +1,34 @@
 import { XMLElement } from "./tokens.mjs"
 import {
 	BasicMap,
+	InputStream,
 	StreamParser,
 	TableParser,
 	Token,
 	TokenMap,
-	delimited
+	limit,
+	preserve,
+	transform
 } from "@hgargg-0710/parsers.js"
 
-// ! AGAIN, the 'no-delim' delimited! [parsers.js v0.2];
+import { function as f } from "@hgargg-0710/one"
+import { _XMLTag } from "../tag/tokens.mjs"
+const { trivialCompose } = f
+
+export const elementHandler = trivialCompose(
+	transform(TableParser(xmlParser)),
+	InputStream
+)
+
 const limitEnd = (input, name) =>
-	delimited(
-		(input) =>
-			Token.type(input.curr()) !== "tag" ||
-			!Token.value(input.curr()).closing ||
-			Token.value(input.curr()) !== name,
-		() => false
-	)(input, elementHandler)
+	elementHandler(
+		limit(
+			(input) =>
+				!_XMLTag.is(input.curr()) ||
+				!Token.value(input.curr()).closing ||
+				Token.value(input.curr()) !== name
+		)(input)
+	)
 
 export const xmlParser = TokenMap(BasicMap)(
 	new Map([
@@ -25,17 +37,13 @@ export const xmlParser = TokenMap(BasicMap)(
 			function (input) {
 				const tag = input.curr().value
 				const { name, closing } = tag
-				if (closing) return XMLElement(name, {}, [])
+				if (closing) return [XMLElement(name, {}, [])]
 				const { attrs } = input.next().value
-				return XMLElement(name, attrs, limitEnd(input, name))
+				return [XMLElement(name, attrs, limitEnd(input, name))]
 			}
 		]
 	]),
-	function (input) {
-		return [input.curr()]
-	}
+	preserve
 )
-
-export const elementHandler = TableParser(xmlParser)
 
 export const XMLElementParser = StreamParser(xmlParser)
