@@ -6,6 +6,7 @@ import { XMLTagParser } from "./tag.mjs"
 import { XMLCharTokenizer } from "./char.mjs"
 import { XMLEntityParser } from "./entity/parser.mjs"
 import { InputStream } from "@hgargg-0710/parsers.js"
+import { XMLCommentParser } from "./comment/parser.mjs"
 
 const { trivialCompose } = _f
 
@@ -16,11 +17,13 @@ export * as tag from "./tag.mjs"
 export { default as generate } from "./generate.mjs"
 
 export const parse = trivialCompose(
-	// XMLElementParser,
-	// InputStream,
+	XMLElementParser,
+	InputStream,
 	XMLTagParser,
 	InputStream,
 	XMLEntityParser,
+	InputStream,
+	XMLCommentParser,
 	InputStream,
 	XMLCharTokenizer
 )

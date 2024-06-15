@@ -1,15 +1,17 @@
 import {
 	OpBrack,
 	ClBrack,
-	ClSlash,
 	EqualitySign,
 	Ampersand,
 	Quote,
 	CommentBeginning,
 	CommentEnding,
 	Space,
-	QuestionMark,
-	XMLSymbol
+	XMLSymbol,
+	QClBrack,
+	QOpBrack,
+	OpSlBrack,
+	ClSlBrack
 } from "./tokens.mjs"
 
 import {
@@ -29,15 +31,17 @@ const { trivialCompose } = _function
 export const xmlCharTokens = RegExpMap(
 	new Map(
 		[
+			[/<\//, OpSlBrack],
+			[/\/>/, ClSlBrack],
+			[/<\?/, QOpBrack],
+			[/\?>/, QClBrack],
+			[/<!--/, CommentBeginning],
+			[/-->/, CommentEnding],
 			[/</, OpBrack],
 			[/>/, ClBrack],
-			[/\//, ClSlash],
 			[/=/, EqualitySign],
 			[/&/, Ampersand],
 			[or(/"/, /'/), Quote],
-			[/!--/, CommentBeginning],
-			[/--/, CommentEnding],
-			[/\?/, QuestionMark],
 			[space(), Space],
 			[/./, XMLSymbol]
 		].map((x) => [global(x[0]), x[1]])

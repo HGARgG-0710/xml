@@ -25,7 +25,8 @@ export const xmlParser = PredicateMap(
 				input.next()
 				return [XMLElement(name, attrs, limitEnd(input, name))]
 			}
-		]
+		],
+		[XMLClosingTag.is, () => []]
 	]),
 	preserve
 )

@@ -1,6 +1,6 @@
 [
 	{
-		"type": "tag",
+		"type": "prolog",
 		"value": {
 			"name": "xml",
 			"attrs": {
@@ -10,7 +10,7 @@
 		}
 	},
 	{
-		"type": "tag",
+		"type": "element",
 		"value": {
 			"name": "Root",
 			"attrs": {
@@ -21,51 +21,127 @@
 					{ "type": "entity", "value": "lt" }
 				],
 				"empty": [{ "type": "substring", "value": "I'M ==EMPTY!'" }]
-			}
+			},
+			"value": [
+				{
+					"type": "element",
+					"value": {
+						"name": "start",
+						"attrs": {},
+						"value": [
+							{ "type": "text", "value": "I AM TEXT 1 " },
+							{ "type": "entity", "value": "gt" },
+							{
+								"type": "text",
+								"value": "SIEGBRAU!\r\n\r\n\t\tBUBUBUBUB!\r\n\r\n\t\t"
+							},
+							{ "type": "entity", "value": "quot" },
+							{ "type": "entity", "value": "apos" }
+						]
+					}
+				},
+				{ "type": "comment", "value": " * I AM A COMMENT!!1 &lt; " },
+				{
+					"type": "element",
+					"value": {
+						"name": "middle",
+						"attrs": {},
+						"value": [
+							{
+								"type": "element",
+								"value": {
+									"name": "middle",
+									"attrs": {
+										"X": [{ "type": "substring", "value": "A" }]
+									},
+									"value": [
+										{
+											"type": "element",
+											"value": {
+												"name": "middle",
+												"attrs": {
+													"B": [
+														{
+															"type": "substring",
+															"value": "Z"
+														}
+													],
+													"log": [
+														{
+															"type": "substring",
+															"value": "sinister"
+														}
+													],
+													"scream": [
+														{
+															"type": "substring",
+															"value": "beautiful!"
+														}
+													]
+												},
+												"value": [
+													{
+														"type": "text",
+														"value": "\"RHUBAB\", what a daft codeword!///\r\n\r\n\t\t\t\t=\r\n\t\t\t\t!--\r\n\t\t\t\t--\r\n\t\t\t"
+													}
+												]
+											}
+										}
+									]
+								}
+							}
+						]
+					}
+				},
+				{
+					"type": "element",
+					"value": {
+						"name": "end",
+						"attrs": {},
+						"value": [
+							{
+								"type": "element",
+								"value": {
+									"name": "another",
+									"attrs": {},
+									"value": [
+										{
+											"type": "element",
+											"value": {
+												"name": "end",
+												"attrs": {},
+												"value": []
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "element",
+								"value": {
+									"name": "end",
+									"attrs": {},
+									"value": [
+										{
+											"type": "element",
+											"value": {
+												"name": "end",
+												"attrs": {},
+												"value": [
+													{
+														"type": "text",
+														"value": "Excellent!\r\n\t\t\t"
+													}
+												]
+											}
+										}
+									]
+								}
+							}
+						]
+					}
+				}
+			]
 		}
-	},
-	{ "type": "tag", "value": { "name": "start", "attrs": {} } },
-	{ "type": "text", "value": "I AM TEXT 1 " },
-	{ "type": "entity", "value": "gt" },
-	{ "type": "text", "value": "SIEGBRAU!\r\n\r\n\t\tBUBUBUBUB!\r\n\r\n\t\t" },
-	{ "type": "entity", "value": "quot" },
-	{ "type": "entity", "value": "apos" },
-	{ "type": "cltag", "value": { "name": "start" } },
-	{ "type": "comment", "value": " * I AM A COMMENT!!1 lt " },
-	{ "type": "tag", "value": { "name": "middle", "attrs": {} } },
-	{
-		"type": "tag",
-		"value": {
-			"name": "middle",
-			"attrs": { "X": [{ "type": "substring", "value": "A" }] }
-		}
-	},
-	{
-		"type": "tag",
-		"value": {
-			"name": "middle",
-			"attrs": {
-				"B": [{ "type": "substring", "value": "Z" }],
-				"log": [{ "type": "substring", "value": "sinister" }],
-				"scream": [{ "type": "substring", "value": "beautiful!" }]
-			}
-		}
-	},
-	{
-		"type": "text",
-		"value": "\"RHUBAB\", what a daft codeword!///\r\n\r\n\t\t\t\t=\r\n\t\t\t\t!--\r\n\t\t\t\t--\r\n\t\t\t"
-	},
-	{ "type": "cltag", "value": { "name": "middle" } },
-	{ "type": "cltag", "value": { "name": "middle" } },
-	{ "type": "cltag", "value": { "name": "middle" } },
-	{ "type": "tag", "value": { "name": "end", "attrs": {} } },
-	{ "type": "tag", "value": { "name": "another", "attrs": {} } },
-	{ "type": "stag", "value": { "name": "end", "attrs": {} } },
-	{ "type": "cltag", "value": { "name": "another" } },
-	{ "type": "tag", "value": { "name": "end", "attrs": {} } },
-	{ "type": "tag", "value": { "name": "end", "attrs": {} } },
-	{ "type": "cltag", "value": { "name": "end" } },
-	{ "type": "cltag", "value": { "name": "end" } },
-	{ "type": "cltag", "value": { "name": "end" } },
-	{ "type": "cltag", "value": { "name": "Root" } }
+	}
 ]

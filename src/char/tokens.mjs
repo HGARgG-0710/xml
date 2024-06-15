@@ -2,26 +2,32 @@
 
 import { TokenInstance, TokenType } from "@hgargg-0710/parsers.js"
 
-export const [OpBrack, ClBrack, Ampersand] = ["opbrack", "clbrack", "amp"].map(
-	TokenInstance
-)
+export const CommentEnding = TokenInstance("commentend")
 
 export const [
+	QOpBrack,
+	QClBrack,
+	OpSlBrack,
+	ClSlBrack,
+	OpBrack,
+	ClBrack,
 	XMLSymbol,
 	Quote,
 	Space,
 	CommentBeginning,
-	CommentEnding,
-	ClSlash,
-	QuestionMark,
-	EqualitySign
+	EqualitySign,
+	Ampersand
 ] = [
+	"qopbrack",
+	"qclbrack",
+	"opslbrack",
+	"clslbrack",
+	"opbrack",
+	"clbrack",
 	"symbol",
 	"quote",
 	"space",
 	"commentbeg",
-	"commentend",
-	"clslash",
-	"qmark",
-	"eqsign"
+	"eqsign",
+	"amp"
 ].map(TokenType)

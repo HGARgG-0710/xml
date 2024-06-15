@@ -4,3 +4,8 @@
 
 	CREATE the 'Validator' API for XML!
 	Don't want to create any of it before Locator is finished (and TypeScript support has finally arrived...)
+
+4. IMPORTANT: the parser is ALMOST finished, HOWEVER... 
+
+	It RETAINS the white spaces right BEFORE the end of a tag... 
+	They are supposed to be ignored. SOLUTION: add a 'text-stripping' step. 
