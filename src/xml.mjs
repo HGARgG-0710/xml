@@ -16,14 +16,11 @@ export * as tag from "./tag.mjs"
 export { default as generate } from "./generate.mjs"
 
 export const parse = trivialCompose(
-	XMLElementParser,
-	InputStream,
+	// XMLElementParser,
+	// InputStream,
 	XMLTagParser,
 	InputStream,
 	XMLEntityParser,
 	InputStream,
 	XMLCharTokenizer
 )
-
-// ! MAKE into an EXPORT! [supposed to be doing what it says... - 'basic'/'full' check...]
-// export const validate = StreamValidator(xmlValidator)

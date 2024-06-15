@@ -1,4 +1,17 @@
-import { function as _function } from "@hgargg-0710/one"
+import {
+	OpBrack,
+	ClBrack,
+	ClSlash,
+	EqualitySign,
+	Ampersand,
+	Quote,
+	CommentBeginning,
+	CommentEnding,
+	Space,
+	QuestionMark,
+	XMLSymbol
+} from "./tokens.mjs"
+
 import {
 	PatternTokenizer,
 	StringPattern,
@@ -9,19 +22,8 @@ import {
 
 const { global, space, or } = regex
 
-import {
-	OpBrack,
-	ClBrack,
-	ClSlash,
-	EqualitySign,
-	Ampersand,
-	Quote,
-	CommentBeginning,
-	CommentEnding,
-	Space
-} from "./tokens.mjs"
-import { structCheck } from "@hgargg-0710/one/src/objects.mjs"
-
+import { object, function as _function } from "@hgargg-0710/one"
+const { structCheck } = object
 const { trivialCompose } = _function
 
 export const xmlCharTokens = RegExpMap(
@@ -35,11 +37,17 @@ export const xmlCharTokens = RegExpMap(
 			[or(/"/, /'/), Quote],
 			[/!--/, CommentBeginning],
 			[/--/, CommentEnding],
-			[space(), Space]
+			[/\?/, QuestionMark],
+			[space(), Space],
+			[/./, XMLSymbol]
 		].map((x) => [global(x[0]), x[1]])
-	),
-	XMLSymbol
+	)
 )
 
 export const charTokenizer = PatternTokenizer(xmlCharTokens, structCheck(["type"]))
-export const XMLCharTokenizer = trivialCompose(Token.value, charTokenizer, StringPattern)
+export const XMLCharTokenizer = trivialCompose(
+	(x) => x.map((x) => (x.value ? { ...x, value: x.value.value } : x)),
+	Token.value,
+	charTokenizer,
+	StringPattern
+)

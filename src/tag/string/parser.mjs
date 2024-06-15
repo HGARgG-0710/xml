@@ -1,17 +1,17 @@
 import {
-	BasicMap,
 	StreamParser,
 	TableParser,
-	TokenMap,
 	preserve,
 	read,
-	TokenSource
+	TokenSource,
+	PredicateMap
 } from "@hgargg-0710/parsers.js"
 import { XMLSubstring } from "./tokens.mjs"
 import { XMLEntity } from "./../../entity/tokens.mjs"
 
-export const xmlStringParser = TokenMap(BasicMap)(
-	new Map([["entity", preserve]], function (input) {
+export const xmlStringParser = PredicateMap(
+	new Map([[XMLEntity.is, preserve]]),
+	function (input) {
 		return [
 			read(
 				(input) => !XMLEntity.is(input.curr()),
@@ -19,7 +19,7 @@ export const xmlStringParser = TokenMap(BasicMap)(
 			)(input).value,
 			...(XMLEntity.is(input.curr()) ? xmlStringTableParser(input) : [])
 		]
-	})
+	}
 )
 
 export const xmlStringTableParser = TableParser(xmlStringParser)

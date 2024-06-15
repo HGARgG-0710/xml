@@ -1,9 +1,18 @@
-import { BasicMap, StreamParser, TokenMap, TokenSource } from "@hgargg-0710/parsers.js"
+import { Ampersand } from "../char.mjs"
+import { XMLEntity } from "./tokens.mjs"
+import {
+	StreamParser,
+	TokenSource,
+	preserve,
+	read,
+	Token,
+	PredicateMap
+} from "@hgargg-0710/parsers.js"
 
-export const entityMap = TokenMap(BasicMap)(
+export const entityMap = PredicateMap(
 	new Map([
 		[
-			"amp",
+			Ampersand.is,
 			function (input) {
 				input.next() // &
 				return [
@@ -14,7 +23,8 @@ export const entityMap = TokenMap(BasicMap)(
 				]
 			}
 		]
-	])
+	]),
+	preserve
 )
 
 export const XMLEntityParser = StreamParser(entityMap)

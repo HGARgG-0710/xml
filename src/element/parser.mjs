@@ -1,19 +1,34 @@
 import { XMLElement } from "./tokens.mjs"
 import {
-	BasicMap,
 	InputStream,
+	PredicateMap,
 	StreamParser,
 	TableParser,
 	Token,
-	TokenMap,
 	limit,
 	preserve,
 	transform
 } from "@hgargg-0710/parsers.js"
 
 import { function as f } from "@hgargg-0710/one"
-import { _XMLTag } from "../tag/tokens.mjs"
-const { trivialCompose } = f
+import { XMLClosingTag, XMLSingleTag, XMLTag } from "../tag/tokens.mjs"
+
+const { or, trivialCompose } = f
+
+export const xmlParser = PredicateMap(
+	new Map([
+		[
+			or(...[XMLTag, XMLSingleTag].map((x) => x.is)),
+			function (input) {
+				const { name, attrs } = input.curr().value
+				if (XMLSingleTag.is(input.curr())) return [XMLElement(name, attrs)]
+				input.next()
+				return [XMLElement(name, attrs, limitEnd(input, name))]
+			}
+		]
+	]),
+	preserve
+)
 
 export const elementHandler = trivialCompose(
 	transform(TableParser(xmlParser)),
@@ -24,26 +39,8 @@ const limitEnd = (input, name) =>
 	elementHandler(
 		limit(
 			(input) =>
-				!_XMLTag.is(input.curr()) ||
-				!Token.value(input.curr()).closing ||
-				Token.value(input.curr()) !== name
+				!XMLClosingTag.is(input.curr()) || Token.value(input.curr()).name !== name
 		)(input)
 	)
-
-export const xmlParser = TokenMap(BasicMap)(
-	new Map([
-		[
-			"tag",
-			function (input) {
-				const tag = input.curr().value
-				const { name, closing } = tag
-				if (closing) return [XMLElement(name, {}, [])]
-				const { attrs } = input.next().value
-				return [XMLElement(name, attrs, limitEnd(input, name))]
-			}
-		]
-	]),
-	preserve
-)
 
 export const XMLElementParser = StreamParser(xmlParser)
