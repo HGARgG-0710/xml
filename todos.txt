@@ -5,7 +5,13 @@
 	CREATE the 'Validator' API for XML!
 	Don't want to create any of it before Locator is finished (and TypeScript support has finally arrived...)
 
-4. IMPORTANT: the parser is ALMOST finished, HOWEVER... 
+4. Things to fix in the 'XML generator', before proceeding with docs and API cleaning...: 
 
-	It RETAINS the white spaces right BEFORE the end of a tag... 
-	They are supposed to be ignored. SOLUTION: add a 'text-stripping' step. 
+	1. The fact that '->" (THE QUOTES ARE NOT PRESERVED!)
+
+		This (pretty much) is impossible to fix (due to how 'element' is made), 
+			SO, instead, add 'FIXERS' for strings - replaces all the " and ' with appropriate 'entities'; 
+	2. Refactoring: 
+
+		1. The 'space-separation' bit/-function ought to be cached in an array (otherwise, a waste of memory); 
+		2. The 'header' and 'content' generators ought to be put into separate functions (exported); 

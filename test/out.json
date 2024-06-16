@@ -82,7 +82,7 @@
 												"value": [
 													{
 														"type": "text",
-														"value": "\"RHUBAB\", what a daft codeword!///\r\n\r\n\t\t\t\t=\r\n\t\t\t\t!--\r\n\t\t\t\t--\r\n\t\t\t"
+														"value": "\"RHUBAB\", what a daft codeword!///\r\n\r\n\t\t\t\t=\r\n\t\t\t\t!--\r\n\t\t\t\t--"
 													}
 												]
 											}
@@ -92,6 +92,10 @@
 							}
 						]
 					}
+				},
+				{
+					"type": "comment",
+					"value": " !!! AND A MULTILINE: \r\n\t 1.\r\n\t2.\r\n\t3.\r\n\t"
 				},
 				{
 					"type": "element",
@@ -130,7 +134,7 @@
 												"value": [
 													{
 														"type": "text",
-														"value": "Excellent!\r\n\t\t\t"
+														"value": "Excellent!"
 													}
 												]
 											}

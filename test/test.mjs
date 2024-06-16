@@ -1,3 +1,5 @@
-import { parse } from "../src/xml.mjs"
+import { generate, parse } from "../src/xml.mjs"
 import { readFile, writeFile } from "fs/promises"
-writeFile("./out.json", JSON.stringify(parse((await readFile("./in.xml")).toString())))
+const parsed = parse((await readFile("./in.xml")).toString())
+writeFile("./out.json", JSON.stringify(parsed))
+writeFile("./out.xml", generate(parsed))

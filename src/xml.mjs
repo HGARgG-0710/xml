@@ -2,7 +2,7 @@
 
 import { function as _f } from "@hgargg-0710/one"
 import { XMLElementParser } from "./element.mjs"
-import { XMLTagParser } from "./tag.mjs"
+import { XMLClosingTag, XMLTagParser, XMLText } from "./tag.mjs"
 import { XMLCharTokenizer } from "./char.mjs"
 import { XMLEntityParser } from "./entity/parser.mjs"
 import { InputStream } from "@hgargg-0710/parsers.js"
@@ -19,6 +19,10 @@ export { default as generate } from "./generate.mjs"
 export const parse = trivialCompose(
 	XMLElementParser,
 	InputStream,
+	(output) =>
+		output.map((x, i, arr) =>
+			XMLText.is(x) && XMLClosingTag.is(arr[i + 1]) ? XMLText(x.value.trim()) : x
+		),
 	XMLTagParser,
 	InputStream,
 	XMLEntityParser,
