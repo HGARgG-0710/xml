@@ -11,7 +11,7 @@
 
 		This (pretty much) is impossible to fix (due to how 'element' is made), 
 			SO, instead, add 'FIXERS' for strings - replaces all the " and ' with appropriate 'entities'; 
-	2. Refactoring: 
 
-		1. The 'space-separation' bit/-function ought to be cached in an array (otherwise, a waste of memory); 
-		2. The 'header' and 'content' generators ought to be put into separate functions (exported); 
+5. IN THE FUTURE: 
+
+	Create a COMPLETE reversal of the 'parser' - the generator MUST BE ABLE to generate tokens' sequences (SAME reversal order as the Parser);
