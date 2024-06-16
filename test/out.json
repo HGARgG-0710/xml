@@ -1,1 +1,156 @@
-[{"type":"prolog","value":{"name":"xml","attrs":{"version":[{"type":"substring","value":"1.0"}],"encoding":[{"type":"substring","value":"UTF-8"}]}}},{"type":"element","value":{"name":"Root","attrs":{"name":[{"type":"substring","value":"This is ???a String! "},{"type":"entity","value":"amp"},{"type":"substring","value":" "},{"type":"entity","value":"lt"}],"empty":[{"type":"substring","value":"I'M ==EMPTY!'"}]},"value":[{"type":"element","value":{"name":"start","attrs":{},"value":[{"type":"text","value":"I AM TEXT 1 "},{"type":"entity","value":"gt"},{"type":"text","value":"SIEGBRAU!\r\n\r\n\t\tBUBUBUBUB!\r\n\r\n\t\t"},{"type":"entity","value":"quot"},{"type":"entity","value":"apos"}]}},{"type":"comment","value":" * I AM A COMMENT!!1 &lt; "},{"type":"element","value":{"name":"middle","attrs":{},"value":[{"type":"element","value":{"name":"middle","attrs":{"X":[{"type":"substring","value":"A"}]},"value":[{"type":"element","value":{"name":"middle","attrs":{"B":[{"type":"substring","value":"Z"}],"log":[{"type":"substring","value":"sinister"}],"scream":[{"type":"substring","value":"beautiful!"}]},"value":[{"type":"text","value":"\"RHUBAB\", what a daft codeword!///\r\n\r\n\t\t\t\t=\r\n\t\t\t\t!--\r\n\t\t\t\t--"}]}}]}}]}},{"type":"comment","value":" !!! AND A MULTILINE: \r\n\t 1.\r\n\t2.\r\n\t3.\r\n\t"},{"type":"element","value":{"name":"end","attrs":{},"value":[{"type":"element","value":{"name":"another","attrs":{},"value":[{"type":"element","value":{"name":"end","attrs":{},"value":[]}}]}},{"type":"element","value":{"name":"end","attrs":{},"value":[{"type":"element","value":{"name":"end","attrs":{},"value":[{"type":"text","value":"Excellent!"}]}}]}}]}}]}}]
+[
+	{
+		"type": "prolog",
+		"value": {
+			"name": "xml",
+			"attrs": {
+				"version": [{ "type": "substring", "value": "1.0" }],
+				"encoding": [{ "type": "substring", "value": "UTF-8" }]
+			}
+		}
+	},
+	{
+		"type": "element",
+		"value": {
+			"name": "Root",
+			"attrs": {
+				"name": [
+					{ "type": "substring", "value": "This is ???a String! " },
+					{ "type": "entity", "value": "amp" },
+					{ "type": "substring", "value": " " },
+					{ "type": "entity", "value": "lt" }
+				],
+				"empty": [{ "type": "substring", "value": "I'M ==EMPTY!'" }]
+			},
+			"value": [
+				{
+					"type": "element",
+					"value": {
+						"name": "start",
+						"attrs": {},
+						"value": [
+							{ "type": "text", "value": "I AM TEXT 1 " },
+							{ "type": "entity", "value": "gt" },
+							{
+								"type": "text",
+								"value": "SIEGBRAU!\r\n\r\n\t\tBUBUBUBUB!\r\n\r\n\t\t"
+							},
+							{ "type": "entity", "value": "quot" },
+							{ "type": "entity", "value": "apos" },
+							{
+								"type": "element",
+								"value": { "name": "T", "attrs": {}, "value": [] }
+							},
+							{ "type": "text", "value": "KARKARKAR!" }
+						]
+					}
+				},
+				{ "type": "comment", "value": " * I AM A COMMENT!!1 &lt; " },
+				{
+					"type": "element",
+					"value": {
+						"name": "middle",
+						"attrs": {},
+						"value": [
+							{
+								"type": "element",
+								"value": {
+									"name": "middle",
+									"attrs": {
+										"X": [{ "type": "substring", "value": "A" }]
+									},
+									"value": [
+										{
+											"type": "element",
+											"value": {
+												"name": "middle",
+												"attrs": {
+													"B": [
+														{
+															"type": "substring",
+															"value": "Z"
+														}
+													],
+													"log": [
+														{
+															"type": "substring",
+															"value": "sinister"
+														}
+													],
+													"scream": [
+														{
+															"type": "substring",
+															"value": "beautiful!"
+														}
+													]
+												},
+												"value": [
+													{
+														"type": "text",
+														"value": "\"RHUBAB\", what a daft codeword!///\r\n\r\n\t\t\t\t=\r\n\t\t\t\t!--\r\n\t\t\t\t--"
+													}
+												]
+											}
+										}
+									]
+								}
+							}
+						]
+					}
+				},
+				{
+					"type": "comment",
+					"value": " !!! AND A MULTILINE: \r\n\t 1.\r\n\t2.\r\n\t3.\r\n\t"
+				},
+				{
+					"type": "element",
+					"value": {
+						"name": "end",
+						"attrs": {},
+						"value": [
+							{
+								"type": "element",
+								"value": {
+									"name": "another",
+									"attrs": {},
+									"value": [
+										{
+											"type": "element",
+											"value": {
+												"name": "end",
+												"attrs": {},
+												"value": []
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "element",
+								"value": {
+									"name": "end",
+									"attrs": {},
+									"value": [
+										{
+											"type": "element",
+											"value": {
+												"name": "end",
+												"attrs": {},
+												"value": [
+													{
+														"type": "text",
+														"value": "Excellent!"
+													}
+												]
+											}
+										}
+									]
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+]

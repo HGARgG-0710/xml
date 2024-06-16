@@ -18,7 +18,7 @@ import {
 	XMLAttribute,
 	XMLClosingTag,
 	XMLSingleTag,
-	XMLPrologTag
+	XMLProlog
 } from "./tokens.mjs"
 
 import {
@@ -79,7 +79,7 @@ export function ClosingTagParser(input) {
 	return [name]
 }
 
-export const tagExtract = [XMLClosingTag, XMLTag, XMLSingleTag, XMLPrologTag].map(
+const tagExtract = [XMLClosingTag, XMLTag, XMLSingleTag, XMLProlog].map(
 	(TagType, i) =>
 		function (parsedTag) {
 			const name = first(parsedTag)
@@ -143,7 +143,7 @@ export const tagParser = PredicateMap(
 	preserve
 )
 
-// ! CREATE AN ALIAS!!! [one.js]; 
+// ! CREATE AN ALIAS!!! [one.js];
 export const limitQuotes = odekv(
 	mkv(
 		new Map(
@@ -158,7 +158,7 @@ export const limitQuotes = odekv(
 	)
 )
 
-const delimHandler = TableParser(
+export const delimHandler = TableParser(
 	PredicateMap(
 		new Map([
 			[

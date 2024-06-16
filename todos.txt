@@ -1,17 +1,20 @@
-1. Test; 
-2. Document; 
-3. IN v0.2 release of 'xml' (when parsers.js 0.2 and Locator is done...): 
+1. Document; 
+2. IN v0.2 release of 'xml' (when parsers.js 0.2 and Locator is done...): 
 
 	CREATE the 'Validator' API for XML!
 	Don't want to create any of it before Locator is finished (and TypeScript support has finally arrived...)
 
-4. Things to fix in the 'XML generator', before proceeding with docs and API cleaning...: 
-
-	1. The fact that '->" (THE QUOTES ARE NOT PRESERVED!)
-
-		This (pretty much) is impossible to fix (due to how 'element' is made), 
-			SO, instead, add 'FIXERS' for strings - replaces all the " and ' with appropriate 'entities'; 
-
-5. IN THE FUTURE: 
+3. IN THE FUTURE: 
 
 	Create a COMPLETE reversal of the 'parser' - the generator MUST BE ABLE to generate tokens' sequences (SAME reversal order as the Parser);
+
+4. FOR DOCUMENTATION (API-related): 
+
+	1. THE 'MAPS'! 
+
+		Each and EVERY function from them MUST be reachable by the user directly!
+		Fix that! [update docs...]; 
+
+	2. Examples: 
+
+		Add a reminder to look at the examples of how the function works ('test' directory)

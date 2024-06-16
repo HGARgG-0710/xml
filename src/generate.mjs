@@ -5,7 +5,7 @@ import {
 	SourceGenerator
 } from "@hgargg-0710/parsers.js"
 import { _XMLElement } from "./element.mjs"
-import { XMLPrologTag, XMLText } from "./tag.mjs"
+import { XMLProlog, XMLText } from "./tag.mjs"
 import { XMLEntity } from "./entity/tokens.mjs"
 
 import { function as _f, object, map } from "@hgargg-0710/one"
@@ -35,7 +35,7 @@ const postSeparated = dekv(
 	)
 )
 
-export const headGenerate = (attrs, input, generator) => {
+const headGenerate = (attrs, input, generator) => {
 	const [attrNames, vals] = attrs
 	return `${
 		attrNames.reduce(
@@ -61,7 +61,7 @@ export const headGenerate = (attrs, input, generator) => {
 	}`
 }
 
-export const bodyGenerate = (value, input, generator) =>
+const bodyGenerate = (value, input, generator) =>
 	Array(value.length)
 		.fill(0)
 		.reduce(
@@ -95,7 +95,7 @@ export const xmlGenerator = PredicateMap(
 			}
 		],
 		[
-			XMLPrologTag.is,
+			XMLProlog.is,
 			function (input, generator) {
 				const { name, attrs } = input.curr().value
 				return StringSource(`<?${name}${headGenerate(attrs, input, generator)}?>`)
@@ -117,26 +117,28 @@ export const XMLGenerator = SourceGenerator(xmlGenerator)
 
 const [valueCheck, attrsCheck] = ["value", "attrs"].map((x) => structCheck([x]))
 
-export function XMLAttrsTransform(xmlTree) {
+function XMLAttrsTransform(xmlTree) {
 	if (xmlTree instanceof Array) return xmlTree.map(XMLAttrsTransform)
 	if (valueCheck(xmlTree) && attrsCheck(xmlTree.value)) {
-		xmlTree.value.attrs = XMLTree(
+		xmlTree.value.attrs = XMLTreeShape(
 			okv(xmlTree.value.attrs).map((x, i) =>
-				i ? XMLTree(x.map((x) => XMLTree(x.map(XMLTree)))) : XMLTree(x)
+				i
+					? XMLTreeShape(x.map((x) => XMLTreeShape(x.map(XMLTreeShape))))
+					: XMLTreeShape(x)
 			)
 		)
 		if (valueCheck(xmlTree.value) && xmlTree.value.value instanceof Array)
-			xmlTree.value.value = XMLTree(XMLAttrsTransform(xmlTree.value.value))
+			xmlTree.value.value = XMLTreeShape(XMLAttrsTransform(xmlTree.value.value))
 	}
-	return XMLTree(xmlTree)
+	return XMLTreeShape(xmlTree)
 }
 
-export function XMLTree(element) {
+function XMLTreeShape(element) {
 	element.children = _XMLElement.is(element)
 		? function () {
 				return [this.value.attrs[1], this.value.value]
 		  }
-		: XMLPrologTag.is(element)
+		: XMLProlog.is(element)
 		? function () {
 				return this.value.attrs[1]
 		  }
@@ -150,5 +152,6 @@ export function XMLTree(element) {
 	return element
 }
 
-export const XMLStream = trivialCompose(TreeStream, XMLTree, XMLAttrsTransform)
+export const XMLTree = trivialCompose(XMLTreeShape, XMLAttrsTransform)
+export const XMLStream = trivialCompose(TreeStream, XMLTree)
 export default (AST) => XMLGenerator(XMLStream(AST), StringSource()).value

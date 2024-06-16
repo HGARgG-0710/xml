@@ -1,8 +1,6 @@
 // * First-level tokens
 
-import { TokenInstance, TokenType } from "@hgargg-0710/parsers.js"
-
-export const CommentEnding = TokenInstance("commentend")
+import { TokenType } from "@hgargg-0710/parsers.js"
 
 export const [
 	QOpBrack,
@@ -15,6 +13,7 @@ export const [
 	Quote,
 	Space,
 	CommentBeginning,
+	CommentEnding,
 	EqualitySign,
 	Ampersand
 ] = [
@@ -28,6 +27,7 @@ export const [
 	"quote",
 	"space",
 	"commentbeg",
+	"commentend",
 	"eqsign",
 	"amp"
 ].map(TokenType)
