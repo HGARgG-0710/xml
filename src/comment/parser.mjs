@@ -8,22 +8,16 @@ import {
 	TokenSource
 } from "@hgargg-0710/parsers.js"
 
+export function CommentParser(input) {
+	input.next()
+	return [
+		read(
+			(input) => !CommentEnding.is(input.curr()),
+			TokenSource(XMLComment(""))
+		)(input).value
+	]
+}
+
 export const XMLCommentParser = StreamParser(
-	PredicateMap(
-		new Map([
-			[
-				CommentBeginning.is,
-				function (input) {
-					input.next()
-					return [
-						read(
-							(input) => !CommentEnding.is(input.curr()),
-							TokenSource(XMLComment(""))
-						)(input).value
-					]
-				}
-			]
-		]),
-		preserve
-	)
+	PredicateMap(new Map([[CommentBeginning.is, CommentParser]]), preserve)
 )

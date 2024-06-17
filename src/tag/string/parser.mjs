@@ -9,17 +9,22 @@ import {
 import { XMLSubstring } from "./tokens.mjs"
 import { XMLEntity } from "./../../entity/tokens.mjs"
 
+// ! REFACTOR THE '() => []' from 'parses.js'!
+const entityGate = TableParser(
+	PredicateMap(new Map([[XMLEntity.is, preserve]]), () => [])
+)
+
+export function StringParser(input) {
+	return [
+		read((input) => !XMLEntity.is(input.curr()), TokenSource(XMLSubstring("")))(input)
+			.value,
+		...entityGate(input)
+	]
+}
+
 export const xmlStringParser = PredicateMap(
 	new Map([[XMLEntity.is, preserve]]),
-	function (input) {
-		return [
-			read(
-				(input) => !XMLEntity.is(input.curr()),
-				TokenSource(XMLSubstring(""))
-			)(input).value,
-			...(XMLEntity.is(input.curr()) ? xmlStringTableParser(input) : [])
-		]
-	}
+	StringParser
 )
 
 export const xmlStringTableParser = TableParser(xmlStringParser)

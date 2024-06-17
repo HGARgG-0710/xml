@@ -41,6 +41,10 @@
 								"type": "element",
 								"value": { "name": "T", "attrs": {}, "value": [] }
 							},
+							{
+								"type": "element",
+								"value": { "name": "R", "attrs": {}, "value": [] }
+							},
 							{ "type": "text", "value": "KARKARKAR!" }
 						]
 					}

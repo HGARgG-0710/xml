@@ -7,14 +7,4 @@
 3. IN THE FUTURE: 
 
 	Create a COMPLETE reversal of the 'parser' - the generator MUST BE ABLE to generate tokens' sequences (SAME reversal order as the Parser);
-
-4. FOR DOCUMENTATION (API-related): 
-
-	1. THE 'MAPS'! 
-
-		Each and EVERY function from them MUST be reachable by the user directly!
-		Fix that! [update docs...]; 
-
-	2. Examples: 
-
-		Add a reminder to look at the examples of how the function works ('test' directory)
+4. Refactor [parsers.js and 'one'];

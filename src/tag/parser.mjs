@@ -44,7 +44,6 @@ const { dekv: odekv } = object
 
 const { trivialCompose, or } = f
 
-// ! REFACTOR [put the stuff relating to the low-level of parsing somewhere else...];
 const clBrackLimitStream = limit(
 	(input) => !ClSlBrack.is(input.curr()) && !ClBrack.is(input.curr())
 )
@@ -69,82 +68,87 @@ const tagDelim = [ClBrack, ClSlBrack, QClBrack].map(
 		)(input, delimHandler)
 )
 
-export const [TagParser, SingleTagParser, PrologParser] = [0, 1, 2].map(
+export const [TagArrayParser, SingleTagArrayParser, PrologArrayParser] = [0, 1, 2].map(
 	(ending) => (input) => [tagName(input), ...tagDelim[ending](input)]
 )
 
-export function ClosingTagParser(input) {
+export function ClosingTagArrayParser(input) {
 	const name = tagName(input)
 	skip(input)((input) => !ClBrack.is(input.curr()))
 	return [name]
 }
 
-const tagExtract = [XMLClosingTag, XMLTag, XMLSingleTag, XMLProlog].map(
-	(TagType, i) =>
-		function (parsedTag) {
-			const name = first(parsedTag)
-			const attrs = firstOut(parsedTag).reduce(
-				(prev, curr) => ({ ...prev, [curr.value.name.value]: curr.value.value }),
-				{}
-			)
-			return [
-				TagType(
-					i
-						? {
-								name,
-								attrs
-						  }
-						: { name }
-				)
-			]
-		}
+export function tagExtract(parsedTag) {
+	const name = first(parsedTag)
+	const attrs = firstOut(parsedTag).reduce(
+		(prev, curr) => ({ ...prev, [curr.value.name.value]: curr.value.value }),
+		{}
+	)
+	return {
+		name,
+		attrs
+	}
+}
+
+const OpenTag = [false, true].map((isSingle) =>
+	trivialCompose(
+		isSingle ? XMLSingleTag : XMLTag,
+		tagExtract,
+		isSingle ? SingleTagArrayParser : TagArrayParser,
+		InputStream
+	)
 )
 
-// ! REFACTOR [give names to each parser...];
+export const ClosingTagParser = trivialCompose(
+	(x) => [x],
+	XMLClosingTag,
+	({ name }) => ({ name }),
+	tagExtract,
+	ClosingTagArrayParser
+)
+
+export function TextParser(input, parser) {
+	let last = null
+	return [
+		read((input) => isText((last = input.curr())), TokenSource(XMLText("")))(input)
+			.value,
+		...(last ? parser(input) : [])
+	]
+}
+
+export function SpaceParser(input, parser) {
+	skipSpace(input)
+	return parser(input)
+}
+
+export function TagParser(input) {
+	const sub = clBrackLimitStream(input)
+	return [OpenTag[+ClSlBrack.is(input.curr())](sub)]
+}
+
+export const PrologParser = trivialCompose(
+	(x) => [x],
+	XMLProlog,
+	tagExtract,
+	PrologArrayParser,
+	InputStream,
+	prologBrackLimit
+)
+
 export const tagParser = PredicateMap(
 	new Map([
 		[XMLEntity.is, preserve],
-		[OpSlBrack.is, trivialCompose(tagExtract[0], ClosingTagParser)],
-		[
-			OpBrack.is,
-			function (input) {
-				const sub = clBrackLimitStream(input)
-				const single = ClSlBrack.is(input.curr())
-				return tagExtract[1 + single](
-					(single ? SingleTagParser : TagParser)(InputStream(sub))
-				)
-			}
-		],
-		[
-			QOpBrack.is,
-			trivialCompose(tagExtract[3], PrologParser, InputStream, prologBrackLimit)
-		],
-		[
-			or(...textTypesArr.map((x) => x.is)),
-			function (input, parser) {
-				let last = null
-				return [
-					read(
-						(input) => isText((last = input.curr())),
-						TokenSource(XMLText(""))
-					)(input).value,
-					...(last ? parser(input) : [])
-				]
-			}
-		],
-		[
-			Space.is,
-			function (input, parser) {
-				skipSpace(input)
-				return parser(input)
-			}
-		]
+		[OpSlBrack.is, ClosingTagParser],
+		[OpBrack.is, TagParser],
+		[QOpBrack.is, PrologParser],
+		[or(...textTypesArr.map((x) => x.is)), TextParser],
+		[Space.is, SpaceParser]
 	]),
 	preserve
 )
 
 // ! CREATE AN ALIAS!!! [one.js];
-export const limitQuotes = odekv(
+const limitQuotes = odekv(
 	mkv(
 		new Map(
 			["'", '"'].map((quote) => [
@@ -158,7 +162,7 @@ export const limitQuotes = odekv(
 	)
 )
 
-export const delimHandler = TableParser(
+const delimHandler = TableParser(
 	PredicateMap(
 		new Map([
 			[
