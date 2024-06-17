@@ -1,8 +1,11 @@
 {
 	"name": "@hgargg-0710/xml",
 	"version": "0.1.0",
+	"description": "A compact library for parsing/generation/construction of XML",
 	"type": "module",
 	"main": "src/xml.mjs",
+	"license": "MIT",
+	"author": "hgargg-0710",
 	"dependencies": {
 		"@hgargg-0710/one": "0.1.2",
 		"@hgargg-0710/parsers.js": "0.1.3"
@@ -12,5 +15,9 @@
 		"ast",
 		"parsing",
 		"generation"
-	]
+	],
+	"bugs": {
+		"url": "https://github.com/HGARgG-0710/xml/issues"
+	},
+	"homepage": "https://github.com/HGARgG-0710/xml#readme"
 }
