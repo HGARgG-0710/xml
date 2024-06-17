@@ -32,17 +32,16 @@ import {
 	TokenSource,
 	limit,
 	preserve,
-	PredicateMap
+	PredicateMap,
+	TypeMap
 } from "@hgargg-0710/parsers.js"
 import { XMLStringParser } from "./string/parser.mjs"
-
-import { array, map, object, function as f } from "@hgargg-0710/one"
 import { XMLEntity } from "../entity/tokens.mjs"
-const { first, firstOut } = array
-const { kv: mkv } = map
-const { dekv: odekv } = object
 
-const { trivialCompose, or } = f
+import { array, map, function as f } from "@hgargg-0710/one"
+const { first, firstOut } = array
+const { toObject } = map
+const { trivialCompose, or, cache } = f
 
 const clBrackLimitStream = limit(
 	(input) => !ClSlBrack.is(input.curr()) && !ClBrack.is(input.curr())
@@ -147,26 +146,21 @@ export const tagParser = PredicateMap(
 	preserve
 )
 
-// ! CREATE AN ALIAS!!! [one.js];
-const limitQuotes = odekv(
-	mkv(
-		new Map(
-			["'", '"'].map((quote) => [
-				quote,
-				limit(
-					(input) =>
-						!Quote.is(input.curr()) || Token.value(input.curr()) !== quote
-				)
-			])
-		)
+const limitQuotes = toObject(
+	cache(
+		(quote) =>
+			limit(
+				(input) => !Quote.is(input.curr()) || Token.value(input.curr()) !== quote
+			),
+		["'", '"']
 	)
 )
 
 const delimHandler = TableParser(
-	PredicateMap(
+	TypeMap(PredicateMap)(
 		new Map([
 			[
-				XMLSymbol.is,
+				XMLSymbol,
 				function (input) {
 					const _skip = skip(input)
 

@@ -6,4 +6,3 @@
 2. IN THE FUTURE: 
 
 	Create a COMPLETE reversal of the 'parser' - the generator MUST BE ABLE to generate tokens' sequences (SAME reversal order as the Parser);
-3. Refactor [parsers.js and 'one'];

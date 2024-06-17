@@ -4,14 +4,15 @@ import {
 	preserve,
 	read,
 	TokenSource,
-	PredicateMap
+	PredicateMap,
+	miss,
+	TypeMap
 } from "@hgargg-0710/parsers.js"
 import { XMLSubstring } from "./tokens.mjs"
 import { XMLEntity } from "./../../entity/tokens.mjs"
 
-// ! REFACTOR THE '() => []' from 'parses.js'!
 const entityGate = TableParser(
-	PredicateMap(new Map([[XMLEntity.is, preserve]]), () => [])
+	TypeMap(PredicateMap)(new Map([[XMLEntity, preserve]]), miss)
 )
 
 export function StringParser(input) {
@@ -22,8 +23,8 @@ export function StringParser(input) {
 	]
 }
 
-export const xmlStringParser = PredicateMap(
-	new Map([[XMLEntity.is, preserve]]),
+export const xmlStringParser = TypeMap(PredicateMap)(
+	new Map([[XMLEntity, preserve]]),
 	StringParser
 )
 

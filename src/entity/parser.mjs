@@ -6,7 +6,8 @@ import {
 	preserve,
 	read,
 	Token,
-	PredicateMap
+	PredicateMap,
+	TypeMap
 } from "@hgargg-0710/parsers.js"
 
 export function EntityParser(input) {
@@ -20,5 +21,5 @@ export function EntityParser(input) {
 }
 
 export const XMLEntityParser = StreamParser(
-	PredicateMap(new Map([[Ampersand.is, EntityParser]]), preserve)
+	TypeMap(PredicateMap)(new Map([[Ampersand, EntityParser]]), preserve)
 )

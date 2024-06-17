@@ -5,7 +5,8 @@ import {
 	StreamParser,
 	preserve,
 	read,
-	TokenSource
+	TokenSource,
+	TypeMap
 } from "@hgargg-0710/parsers.js"
 
 export function CommentParser(input) {
@@ -19,5 +20,5 @@ export function CommentParser(input) {
 }
 
 export const XMLCommentParser = StreamParser(
-	PredicateMap(new Map([[CommentBeginning.is, CommentParser]]), preserve)
+	TypeMap(PredicateMap)(new Map([[CommentBeginning, CommentParser]]), preserve)
 )

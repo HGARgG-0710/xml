@@ -2,7 +2,8 @@ import {
 	TreeStream,
 	StringSource,
 	PredicateMap,
-	SourceGenerator
+	SourceGenerator,
+	childIndex
 } from "@hgargg-0710/parsers.js"
 import { _XMLElement } from "./element.mjs"
 import { XMLProlog, XMLText } from "./tag.mjs"
@@ -12,28 +13,14 @@ import { function as _f, object, map } from "@hgargg-0710/one"
 import { XMLComment } from "./comment/tokens.mjs"
 import { XMLSubstring } from "./tag/string/tokens.mjs"
 
-const { trivialCompose, or } = _f
-const { dekv, kv: okv, structCheck } = object
-const { kv: mkv } = map
+const { kv: okv, structCheck } = object
+const { toObject } = map
+const { trivialCompose, or, cache } = _f
 
-// TODO: MAKE AN ALIAS IN 'one.js'!!! [used in another place in the 'xml'...]
-const preSeparated = dekv(
-	mkv(
-		new Map(
-			[" ", "\n"].map((sep) => [
-				sep,
-				[(x) => x, (x) => StringSource(sep).concat(x)]
-			])
-		)
-	)
-)
-const postSeparated = dekv(
-	mkv(
-		new Map(
-			["\n"].map((sep) => [sep, [(x) => x, (x) => x.concat(StringSource(sep))]])
-		)
-	)
-)
+const [preSeparated, postSeparated] = [
+	[(sep) => [(x) => x, (x) => StringSource(sep).concat(x)], [" ", "\n"]],
+	[(sep) => [(x) => x, (x) => x.concat(StringSource(sep))], ["\n"]]
+].map((x) => toObject(cache(...x)))
 
 const headGenerate = (attrs, input, generator) => {
 	const [attrNames, vals] = attrs
@@ -145,10 +132,7 @@ function XMLTreeShape(element) {
 		: function () {
 				return this
 		  }
-	//   TODO: REFACTOR from 'parsers.js'!!!
-	element.index = function (multind) {
-		return multind.reduce((prev, curr) => prev.children()[curr], this)
-	}
+	element.index = childIndex
 	return element
 }
 

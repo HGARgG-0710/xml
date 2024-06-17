@@ -6,6 +6,7 @@ import {
 	TableParser,
 	Token,
 	limit,
+	miss,
 	preserve,
 	transform
 } from "@hgargg-0710/parsers.js"
@@ -25,8 +26,7 @@ export function ElementParser(input) {
 export const xmlParser = PredicateMap(
 	new Map([
 		[or(...[XMLTag, XMLSingleTag].map((x) => x.is)), ElementParser],
-		// ! MAKE AN ALIAS FOR 'parsers.js' - 'miss' (that is just a '() => []');
-		[XMLClosingTag.is, () => []]
+		[XMLClosingTag.is, miss]
 	]),
 	preserve
 )
