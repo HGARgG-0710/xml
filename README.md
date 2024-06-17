@@ -31,13 +31,13 @@ The top-level exports are the following:
 ### Functions
 
 ```ts
-function parse(xml: string): (XMLProlog | XMLElement)[]
+function parse(xml: string): (XMLProlog | _XMLElement)[]
 ```
 
 Parses a given XML text and returns it as an AST.
 
 ```ts
-function generate(XMLAST: (XMLProlog | XMLElement)[]): string
+function generate(XMLAST: (XMLProlog | _XMLElement)[]): string
 ```
 
 Takes the XML AST (result of `parser`) and converts it to corresponding XML text.
@@ -77,7 +77,7 @@ const XMLStream: Stream
 A `TreeStream` function intended as input for `XMLGenerator`.
 
 ```ts
-function XMLTree(XMLAST: (XMLElement | XMLProlog)[]): Tree
+function XMLTree(XMLAST: (_XMLElement | XMLProlog)[]): Tree
 ```
 
 Converts the XML AST (result of `parser`) into a `Tree`-interface (so as to be `TreeStream`-convertible).
@@ -179,6 +179,12 @@ An `IndexMap` used for defining `XMLCharTokenizer`, which
 is a component of the `parser` function.
 
 ```ts
+const charTokenizer: PatternTokenizer
+```
+
+A `PatternTokenizer` based off `xmlCharTokens`.
+
+```ts
 function XMLCharTokenizer(xml: string): Token[]
 ```
 
@@ -200,6 +206,12 @@ const XMLComment: TokenType
 Represents an XML comment.
 
 ##### Parsing
+
+```ts
+function CommentParser(input: Stream): [XMLComment]
+```
+
+A function used for parsing XML comments. The `XMLCommentParser` `StreamParser` is based on it.
 
 ```ts
 const XMLCommentParser: StreamParser
@@ -224,6 +236,12 @@ const XMLEntity: TokenType
 Represents an XML entity (ex: `&amp;` is the ampersand).
 
 ##### Parsing
+
+```ts
+function EntityParser(input: Stream): [XMLEntity]
+```
+
+A function used for parsing XML entities. On it the `XMLEntityParser` is based.
 
 ```ts
 const XMLEntityParser: StreamParser
@@ -298,15 +316,172 @@ An internal `TokenType`, used for representing attributes (does not appear in fi
 
 ##### Parsing
 
-<!-- ! COMPLETE! -->
+```ts
+function TagArrayParser(input: Stream): [string, ...XMLAttribute[]]
+```
+
+Parses the next opening tag `<X attr1="..." ...>`, and returns it as
+an array with the first element being the name and the rest being the attributes.
+
+Alters `input`
+
+```ts
+function SingleTagArrayParser(input: Stream): [string, ...XMLAttribute[]]
+```
+
+Same as `TagArrayParser`, but for a single tag: `<X attr1="..." ... />`
+
+```ts
+function PrologArrayParser(input: Stream): [string, ...XMLAttribute[]]
+```
+
+Same as `TagArrayParser`, but for a prolog tag: `<?xml attr1="..." ... ?>`
+
+```ts
+function ClosingTagArrayParser(input: Stream): [string]
+```
+
+Same as `TagArrayParser`, but for a closing tag: `</X>`.
+
+As they carry no attributes, the only element of the returned array is the name of the element.
+
+```ts
+function tagExtract(tagArray: [string, ...XMLAttribute[]]): {
+	name: string
+	attrs: { [k: string]: [v: (XMLSubstring | XMLEntity)[]] }
+}
+```
+
+Converts the `[string, ...XMLAttribute[]]` into the final `attrs` form.
+It survives all the other parsing layers.
+
+```ts
+function ClosingTagParser(input: Stream): [XMLClosingParser]
+```
+
+Conducts the parsing of a closing tag from beginning to end. Alters `input`.
+
+```ts
+function TextParser(input: Stream, parser: (input: Stream): any[]): [XMLText, ...any[]]
+```
+
+Parses `XMLText` from beginning to end, and also the next token from `input` (if present).
+
+```ts
+function SpaceParser(input: Stream, parser: (input: Stream): any[]): any[]
+```
+
+Skips all the `Space`s, returning the result of parsing of the next token.
+
+```ts
+function TagParser(input: Stream, parser: (input: Stream): any[]): [XMLTag | XMLSingleTag]
+```
+
+Parses either one of `XMLSingleTag` or `XMLTag` from beginning to end.
+Alters `input`.
+
+```ts
+function PrologParser(input: Stream, parser: (input: Stream): any[]): [XMLProlog]
+```
+
+Parses an `XMLProlog` from beginning to end. Alters `input`.
+
+```ts
+const tagParser: PredicateMap
+```
+
+A `PredicateMap`, on which the `XMLTagParser` is based.
+
+```ts
+const XMLTagParser: StreamParser
+```
+
+A `StreamParser` that transforms the previous layer of parsing into one containing tags.
 
 ##### Submodules
 
-The module contains the only submodule of `string`, which contains the parsing
+The module contains the only submodule of `string`, which handles the parsing
+of the strings used for attribute values.
 
 ###### `string`
 
+###### Tokens
+
+```ts
+const XMLSubstring: TokenType
+```
+
+A `TokenType` representing an entity-free section of a given XML string `"..."`
+
+###### Parsing
+
+```ts
+function StringParser(input: Stream): [XMLSubstring, XMLEntity?]
+```
+
+Parses the next `XMLSubstring` fragment, together with (possibly),
+the next entity.
+
+Alters `input`.
+
+```ts
+const xmlStringParser: PredicateMap
+```
+
+A `PredicateMap`, on which the `XMLStringParser` is based.
+
+```ts
+const XMLStringParser: StreamParser
+```
+
+A `StreamParser`, which, given a `Stream` that only includes `XMLEntity` and
+any other token type with `.value` property, returns an `(XMLSubstring | XMLEntity)[]`.
+
+<br>
+
 #### `element`
+
+This is the fifth and final layer of parsing of an XML document.
+It converts tags into elements and structures their contents into a tree.
+
+##### Tokens
+
+```ts
+const _XMLElement: TokenType
+```
+
+A `TokenType` representing final-level XML elements.
+
+```ts
+function XMLElement(
+	name: string,
+	attrs: { [attrName: string]: [attrVal: (XMLSubstring | XMLEntity)[]] },
+	value: (_XMLElement | XMLText | XMLComment | XMLEntity)[]
+): _XMLElement
+```
+
+A function that passes the three given values as an object to `_XMLElement` (`{ name, attrs, value }`).
+
+##### Parsing
+
+```ts
+function ElementParser(input: Stream): [_XMLElement]
+```
+
+Converts the current tag from the `input` `Stream` into an `_XMLElement`.
+Alters `input`.
+
+```ts
+const xmlParser: PredicateMap
+```
+
+A `PredicateMap`, on which the `XMLElementParser` is based.
+
+```ts
+const XMLElementParser: StreamParser
+```
+
+A `StreamParser` representing the last parsing layer of XML, takes in the `Stream` of the previous parsing layer.
 
 ### Usage
 

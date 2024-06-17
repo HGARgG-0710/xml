@@ -24,8 +24,7 @@ import {
 
 const { global, space, or } = regex
 
-import { object, function as _function } from "@hgargg-0710/one"
-const { structCheck } = object
+import { function as _function } from "@hgargg-0710/one"
 const { trivialCompose } = _function
 
 export const xmlCharTokens = RegExpMap(
@@ -48,7 +47,7 @@ export const xmlCharTokens = RegExpMap(
 	)
 )
 
-export const charTokenizer = PatternTokenizer(xmlCharTokens, structCheck(["type"]))
+export const charTokenizer = PatternTokenizer(xmlCharTokens)
 export const XMLCharTokenizer = trivialCompose(
 	(x) => x.map((x) => (x.value ? { ...x, value: x.value.value } : x)),
 	Token.value,

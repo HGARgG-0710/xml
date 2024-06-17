@@ -27,5 +27,4 @@ export const xmlStringParser = PredicateMap(
 	StringParser
 )
 
-export const xmlStringTableParser = TableParser(xmlStringParser)
 export const XMLStringParser = StreamParser(xmlStringParser)

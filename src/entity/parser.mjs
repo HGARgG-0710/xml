@@ -9,7 +9,7 @@ import {
 	PredicateMap
 } from "@hgargg-0710/parsers.js"
 
-export function EntitiParser(input) {
+export function EntityParser(input) {
 	input.next() // &
 	return [
 		read(
@@ -20,5 +20,5 @@ export function EntitiParser(input) {
 }
 
 export const XMLEntityParser = StreamParser(
-	PredicateMap(new Map([[Ampersand.is, EntitiParser]]), preserve)
+	PredicateMap(new Map([[Ampersand.is, EntityParser]]), preserve)
 )
