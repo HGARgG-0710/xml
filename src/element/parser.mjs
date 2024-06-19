@@ -31,14 +31,26 @@ export const xmlParser = PredicateMap(
 	preserve
 )
 
+// ? Add these two to the 'parsers.js'? [this is a VERY frequent task whenever parsing recursive expressions...]; 
+// % hypothetical signature [note THIS IS WITHOUT THE 'elementHandler'! JUST the 'limit']: 1. inflation (inflation predicate); 2. deflation (deflation predicate)
 const elementHandler = trivialCompose(transform(TableParser(xmlParser)), InputStream)
 
-const limitEnd = (input, name) =>
-	elementHandler(
+const limitEnd = (input, name) => {
+	let depth = 1
+	const depthInflate = (x) => x && (depth += x)
+	const depthDeflate = (x) => !x || (depth -= x)
+	return elementHandler(
 		limit(
 			(input) =>
-				!XMLClosingTag.is(input.curr()) || Token.value(input.curr()).name !== name
+				depthInflate(
+					XMLTag.is(input.curr()) && Token.value(input.curr()).name === name
+				) ||
+				depthDeflate(
+					XMLClosingTag.is(input.curr()) &&
+						Token.value(input.curr()).name === name
+				)
 		)(input)
 	)
+}
 
 export const XMLElementParser = StreamParser(xmlParser)

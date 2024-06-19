@@ -136,7 +136,15 @@ export const PrologParser = trivialCompose(
 
 export const tagParser = PredicateMap(
 	new Map([
-		[XMLEntity.is, preserve],
+		[
+			XMLEntity.is,
+			function (input, parser) {
+				const entity = input.next()
+				return [entity].concat(
+					Space.is(input.curr()) ? TextParser(input, parser) : parser(input)
+				)
+			}
+		],
 		[OpSlBrack.is, ClosingTagParser],
 		[OpBrack.is, TagParser],
 		[QOpBrack.is, PrologParser],

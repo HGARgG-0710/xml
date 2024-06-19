@@ -1,6 +1,6 @@
 {
 	"name": "@hgargg-0710/xml",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "A compact library for parsing/generation/construction of XML",
 	"type": "module",
 	"main": "src/xml.mjs",
