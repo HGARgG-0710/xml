@@ -1,0 +1,11 @@
+{
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Parser Profiling",
+			"program": "${workspaceFolder}/test/test.mjs",
+			"cwd": "${workspaceFolder}/test"
+		}
+	]
+}

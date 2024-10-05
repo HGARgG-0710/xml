@@ -10,15 +10,6 @@ import { XMLCommentParser } from "./comment/parser.mjs"
 
 const { trivialCompose } = _f
 
-export * as entity from "./entity.mjs"
-export * as comment from "./comment.mjs"
-export * as generator from "./generate.mjs"
-export * as char from "./char.mjs"
-export * as element from "./element.mjs"
-export * as tag from "./tag.mjs"
-
-export { default as generate } from "./generate.mjs"
-
 export const parse = trivialCompose(
 	XMLElementParser,
 	InputStream,
@@ -34,3 +25,12 @@ export const parse = trivialCompose(
 	InputStream,
 	XMLCharTokenizer
 )
+
+export { default as generate } from "./generate.mjs"
+
+export * as entity from "./entity.mjs"
+export * as comment from "./comment.mjs"
+export * as generator from "./generate.mjs"
+export * as char from "./char.mjs"
+export * as element from "./element.mjs"
+export * as tag from "./tag.mjs"
