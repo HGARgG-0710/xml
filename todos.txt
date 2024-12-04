@@ -6,3 +6,24 @@
 2. IN THE FUTURE: 
 
 	Create a COMPLETE reversal of the 'parser' - the generator MUST BE ABLE to generate tokens' sequences (SAME reversal order as the Parser);
+
+3. Also: 	
+
+	Support creation of diverse "xml-like" grammars; 
+	Namely: 
+
+		1. Allow optional parsing/non-parsing of certain tags; 
+			This (specifically) applies to SVG-like formats, where one needs to be able to "inject" 
+				a foreign parser into the contents of a given Tag; 
+		2. Allow one to have specific TAG-Set-BASED Validator-s; 
+			To permit only a SPECIFIC set of signatures for each tag, and only if they belong to the set of permitted tags; 
+		3. Permit/forbid certain aspects of a parser (example: HTML); 
+			In HTML, one can do: 
+
+				<input type="text"> # correct 
+			
+			Whereas in XML, one is forced to do: 
+
+				<input type="text"/>
+			
+			Permit non-closing single tags [AND their recognition...]; 
